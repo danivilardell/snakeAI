@@ -1,5 +1,4 @@
 var dist;
-var mapaDespres;
 
 function bfs(applePos) {
 	var Q = new Queue();
@@ -23,21 +22,33 @@ function bfs(applePos) {
 }
 
 function tanca(pos_i, pos_j) {
-	mapaDespres = Array(GAME_SIZE).fill().map(()=>Array(GAME_SIZE).fill())
+	var mapaDespres = Array(GAME_SIZE).fill().map(()=>Array(GAME_SIZE).fill());
+	var mapaAbans = Array(GAME_SIZE).fill().map(()=>Array(GAME_SIZE).fill());
 	for(var i = 0; i < GAME_SIZE; i++) {
 		for(var j = 0; j < GAME_SIZE; j++) {
 			mapaDespres[i][j] = currBoard[i][j];
+			mapaAbans[i][j] = currBoard[i][j];
 		}
 	}
 
 	mapaDespres[pos_i][pos_j] = 1;
 
 	var pintat = false;
-
 	for(var i = 0; i < GAME_SIZE; i++) {
 		for(var j = 0; j < GAME_SIZE; j++) {
 			if(mapaDespres[i][j] == 0) {
-				pinta(i, j);
+				pinta(i, j, mapaDespres);
+				pintat = true;
+				break;
+			}
+		}
+		if(pintat) break;
+	}
+	pintat = false;
+	for(var i = 0; i < GAME_SIZE; i++) {
+		for(var j = 0; j < GAME_SIZE; j++) {
+			if(mapaAbans[i][j] == 0) {
+				pinta(i, j, mapaAbans);
 				pintat = true;
 				break;
 			}
@@ -47,7 +58,7 @@ function tanca(pos_i, pos_j) {
 
 	for(var i = 0; i < GAME_SIZE; i++) {
 		for(var j = 0; j < GAME_SIZE; j++) {
-			if(mapaDespres[i][j] == 0) {
+			if((i != pos_i || j != pos_j) && mapaDespres[i][j] != mapaAbans[i][j]) {
 				return true;
 			}
 		}
@@ -55,11 +66,11 @@ function tanca(pos_i, pos_j) {
 	return false;
 }
 
-function pinta(pos_i, pos_j) {
-	if(pos_i < 0 || pos_j < 0 || pos_i >= GAME_SIZE || pos_j >= GAME_SIZE || mapaDespres[pos_i][pos_j] == 1) return;
-	if(mapaDespres[pos_i][pos_j] == 0) mapaDespres[pos_i][pos_j] = 1;
+function pinta(pos_i, pos_j, mapa) {
+	if(pos_i < 0 || pos_j < 0 || pos_i >= GAME_SIZE || pos_j >= GAME_SIZE || mapa[pos_i][pos_j] == 1) return;
+	if(mapa[pos_i][pos_j] == 0) mapa[pos_i][pos_j] = 1;
 
-	for(var i = 0; i < 4; i++) pinta(pos_i + MOVE_X[i], pos_j + MOVE_Y[i]);
+	for(var i = 0; i < 4; i++) pinta(pos_i + MOVE_X[i], pos_j + MOVE_Y[i], mapa);
 }
 
 function getNextMoveAI(_callback) {
@@ -76,7 +87,7 @@ function getNextMoveAI(_callback) {
 
 	var headPosition = snakePosition.head();
 	var minDist = GAME_SIZE*GAME_SIZE;
-
+	console.log("hola0")
 	for(var i = 0; i < 4; i++) {
 		var next_i = MOVE_X[i] + headPosition[0], next_j = MOVE_Y[i] + headPosition[1];
 		if(next_i >= 0 && next_i < GAME_SIZE && next_j >= 0 && next_j < GAME_SIZE && dist[next_i][next_j] < minDist &&
@@ -88,7 +99,7 @@ function getNextMoveAI(_callback) {
 	}
 	
 	if(minDist == GAME_SIZE*GAME_SIZE) {
-		console.log("hola")
+		console.log("hola1")
 		for(var i = 0; i < 4; i++) {
 			var next_i = MOVE_X[i] + headPosition[0], next_j = MOVE_Y[i] + headPosition[1];
 			if(next_i >= 0 && next_i < GAME_SIZE && next_j >= 0 && next_j < GAME_SIZE && currBoard[next_i][next_j] != 1 && 
@@ -97,7 +108,7 @@ function getNextMoveAI(_callback) {
 				_callback();
 			}
 		}
-
+		console.log("hola2")
 		minDist = GAME_SIZE*GAME_SIZE;
 		for(var i = 0; i < 4; i++) {
 			var next_i = MOVE_X[i] + headPosition[0], next_j = MOVE_Y[i] + headPosition[1];
@@ -109,11 +120,10 @@ function getNextMoveAI(_callback) {
 		}
 
 		if(minDist == GAME_SIZE*GAME_SIZE) {
-			console.log("hola2")
+			console.log("hola3")
 			for(var i = 0; i < 4; i++) {
 				var next_i = MOVE_X[i] + headPosition[0], next_j = MOVE_Y[i] + headPosition[1];
 				if(next_i >= 0 && next_i < GAME_SIZE && next_j >= 0 && next_j < GAME_SIZE && currBoard[next_i][next_j] != 1) {
-					console.log("hola3");
 					lastClick = i;
 					_callback();
 					return;

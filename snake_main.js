@@ -3,7 +3,7 @@ var canvasContext;
 
 let surround = 5;
 var BOARD_SIZE = 600;
-var GAME_SIZE = 30;
+var GAME_SIZE = 50;
 var MOVE_X = [-1, 1, 0, 0];
 var MOVE_Y = [0, 0, -1, 1];
 
@@ -27,11 +27,11 @@ window.onload = async function() {
             });
         }
         else {
-            if(counter == 300) initialize();
+            if(counter == -1) initialize();
             counter++;
         }
 
-	}, 10);
+	}, 1);
 }
 
 function initialize() {
